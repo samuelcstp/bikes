@@ -1,6 +1,7 @@
 package ifc.edu.br.bikes.web.excpetion;
 
 import ifc.edu.br.bikes.exception.EntityNotFoundExcpetion;
+import ifc.edu.br.bikes.exception.PasswordInvalidException;
 import ifc.edu.br.bikes.exception.UsernameUniqueViolationExcpetion;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -45,5 +46,17 @@ public class ApiExceptionHandler {
                 .status(HttpStatus.NOT_FOUND)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new ErrorMessage(request, HttpStatus.NOT_FOUND, ex.getMessage()));
+    }
+
+    // handler que trata a exceção de senha inválida se a validação não passar
+    @ExceptionHandler(PasswordInvalidException.class)
+    public ResponseEntity<ErrorMessage> passwordInvalidException(
+            RuntimeException ex,
+            HttpServletRequest request){
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorMessage(request, HttpStatus.BAD_REQUEST, ex.getMessage()));
     }
 }

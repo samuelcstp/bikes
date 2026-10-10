@@ -2,6 +2,7 @@ package ifc.edu.br.bikes.web.controller;
 
 import ifc.edu.br.bikes.dto.UsuarioRequestDTO;
 import ifc.edu.br.bikes.dto.UsuarioResponseDTO;
+import ifc.edu.br.bikes.dto.UsuarioSenhaDTO;
 import ifc.edu.br.bikes.service.UsuarioService;
 import ifc.edu.br.bikes.web.excpetion.ErrorMessage;
 import io.swagger.v3.oas.annotations.Operation;
@@ -66,15 +67,14 @@ public class UsuarioController {
                     @ApiResponse(responseCode = "400", description = "Senha não confere",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
                     @ApiResponse(responseCode = "404", description = "Recurso não encontrado",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
+                    @ApiResponse(responseCode = "422", description = "Recurso não processado por dados de entrada invalidos",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
             })
-    public ResponseEntity<UsuarioResponseDTO> updatePassword(@PathVariable Long id, @RequestBody UsuarioRequestDTO usuario){
-        UsuarioResponseDTO updatedUsuario = usuarioService.updatePassword(id, usuario.password());
-        if(updatedUsuario != null){
-            return ResponseEntity.ok(updatedUsuario);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    // valida a requisição com os campos do DTO antes de chamar o metodo do service
+    public ResponseEntity<Void> updatePassword(@PathVariable Long id, @Valid @RequestBody UsuarioSenhaDTO usuario){
+        usuarioService.updatePassword(id, usuario);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping
