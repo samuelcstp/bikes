@@ -2,6 +2,7 @@ package ifc.edu.br.bikes;
 
 import ifc.edu.br.bikes.dto.UsuarioRequestDTO;
 import ifc.edu.br.bikes.dto.UsuarioResponseDTO;
+import ifc.edu.br.bikes.dto.UsuarioSenhaDTO;
 import ifc.edu.br.bikes.web.excpetion.ErrorMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -135,5 +136,61 @@ public class UsuarioIT extends RuntimeException {
 
         org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
         org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(404);
+    }
+
+    @Test // TESTA O CASO DE SUCESSO - ALTERAÇÃO DE SENHA COM DADOS VÁLIDOS
+    public void alterarSenha_DadosValidos_RetornaNoContent(){
+        testClient
+                .patch()
+                .uri("/api/v1/usuarios/100")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UsuarioSenhaDTO("123456", "654321", "654321"))
+                .exchange()
+                // A alteração é concluída e não devolve corpo de resposta.
+                .expectStatus().isNoContent();
+    }
+
+    @Test // TESTA O CASO DE ERRO - SENHA ATUAL NÃO CONFERE
+    public void alterarSenha_SenhaAtualInvalida_RetornaBadRequest(){
+        testClient
+                .patch()
+                .uri("/api/v1/usuarios/100")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UsuarioSenhaDTO("654321", "111111", "111111"))
+                .exchange()
+                // A senha atual incorreta retorna 400 (Bad Request).
+                .expectStatus().isBadRequest();
+    }
+
+    @Test // TESTA O CASO DE ERRO - NOVA SENHA E CONFIRMAÇÃO SÃO DIFERENTES
+    public void alterarSenha_NovaSenhaEConfirmacaoDiferentes_RetornaBadRequest(){
+        testClient
+                .patch()
+                .uri("/api/v1/usuarios/100")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UsuarioSenhaDTO("123456", "654321", "111111"))
+                .exchange()
+                // Senhas diferentes retornam 400 (Bad Request).
+                .expectStatus().isBadRequest();
+    }
+
+    @Test // TESTA CAMPOS VAZIOS E SENHAS COM MENOS OU MAIS DE 6 CARACTERES
+    public void alterarSenha_CamposInvalidos_RetornaUnprocessableContent(){
+        UsuarioSenhaDTO[] senhasInvalidas = {
+                new UsuarioSenhaDTO("", "", ""),
+                new UsuarioSenhaDTO("12345", "12345", "12345"),
+                new UsuarioSenhaDTO("1234567", "1234567", "1234567")
+        };
+
+        for (UsuarioSenhaDTO senha : senhasInvalidas) {
+            testClient
+                    .patch()
+                    .uri("/api/v1/usuarios/100")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(senha)
+                    .exchange()
+                    // Dados fora das validações do DTO retornam 422 (Unprocessable Content).
+                    .expectStatus().isEqualTo(422);
+        }
     }
 }
