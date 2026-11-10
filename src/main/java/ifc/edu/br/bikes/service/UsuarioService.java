@@ -8,9 +8,13 @@ import ifc.edu.br.bikes.entity.Usuario;
 import ifc.edu.br.bikes.exception.EntityNotFoundExcpetion;
 import ifc.edu.br.bikes.exception.PasswordInvalidException;
 import ifc.edu.br.bikes.exception.UsernameUniqueViolationExcpetion;
+import ifc.edu.br.bikes.jwt.JwtAuthorizationFilter;
+import ifc.edu.br.bikes.jwt.JwtUserDetailsService;
 import ifc.edu.br.bikes.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,10 +24,12 @@ import java.util.List;
 public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final UsuarioMapper usuarioMapper;
+    private final PasswordEncoder passwordEncoder;
 
     public UsuarioResponseDTO create(UsuarioRequestDTO usuarioRequestDTO){
         try{
             Usuario usuario = usuarioMapper.toUsuario(usuarioRequestDTO);
+            usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
             return usuarioMapper.toResponse(usuarioRepository.save(usuario));
         } catch (RuntimeException ex) {
             throw new UsernameUniqueViolationExcpetion(String.format("O username '%s' já existe.", usuarioRequestDTO.username()));
@@ -43,21 +49,36 @@ public class UsuarioService {
                 () -> new EntityNotFoundExcpetion(String.format("O usuário com id '%d' não encontrado.", id))
         );
 
-        // validação da senha atual e da senha salva com a classe de exceção para senhas invalidas
-        if (!usuario.getPassword().equals(usuarioSenhaDTO.senhaAtual())) {
+        // validação da senha atual com o passwordEncoder
+        if (!passwordEncoder.matches(usuarioSenhaDTO.senhaAtual(), usuario.getPassword())) {
             throw new PasswordInvalidException("A senha atual não confere.");
         }
 
-        // validação da nova senha com a confirmação de senha usando a mesma exceção
+        // validação da nova senha com a confirmação de senha
         if (!usuarioSenhaDTO.novaSenha().equals(usuarioSenhaDTO.confirmaSenha())) {
             throw new PasswordInvalidException("A nova senha não confere com a confirmação de senha.");
         }
 
-        usuario.setPassword(usuarioSenhaDTO.novaSenha());
+        usuario.setPassword(passwordEncoder.encode(usuarioSenhaDTO.novaSenha()));
         usuarioRepository.save(usuario);
     }
 
     public List<UsuarioResponseDTO> getAll(){
         return usuarioMapper.toResponse(usuarioRepository.findAll());
+    }
+
+    @Transactional
+    public Usuario buscarPorNome(String username) {
+        return usuarioRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundExcpetion(String.format("Usuário '%s' não encontrado", username)));
+    }
+
+    public Usuario.Role buscarRolePorUsername(String username) {
+        return usuarioRepository.findRoleByUsername(username);
+    }
+
+    @Bean
+    public JwtAuthorizationFilter jwtAuthorizationFilter(JwtUserDetailsService detailsService) {
+        return new JwtAuthorizationFilter(detailsService);
     }
 }
