@@ -30,10 +30,14 @@ public class SpringSecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/usuarios").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth").permitAll()
                         .requestMatchers(
+                                "/docs-bikes",
                                 "/docs-bikes.html",
                                 "/docs-bikes/**",
                                 "/swagger-ui/**",
-                                "/v3/api-docs/**"
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**",
+                                "/webjars/**",
+                                "/error"
                         ).permitAll()
                         .anyRequest().authenticated()
                 ).sessionManagement(

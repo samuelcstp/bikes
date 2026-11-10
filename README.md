@@ -23,3 +23,29 @@ Foram implementados testes de integração em `UsuarioIT` para validar os 4 cen�
 4. **Campos inválidos:** requisições com senhas vazias ou com tamanho menor/maior que 6 caracteres retornam status `422 Unprocessable Content`.
 
 ---
+
+## Atividade 03 - Recurso Cliente
+
+Um cliente só pode ser cadastrado se tiver um `usuário` associado (ou seja, deve ter um usuário cadastrado e autenticado).
+
+**Recurso `Cliente`:**
+- `id` (Long)
+- `nome` (String)
+- `cpf` (String) - deve ser único e válido
+- Campos de auditoria (data de criação, data de modificação, criado por, modificado por)
+
+**Regras e Funcionalidades:**
+- O cadastro só pode ser realizado se o usuário estiver autenticado.
+- O cliente pode consultar apenas os seus próprios dados.
+- O Admin pode consultar os dados de todos os clientes.
+
+**Classes criadas:**
+- Classes de DTO (`ClienteCreateDto`, `ClienteResponseDto`, `ClienteMapper`)
+- Controller (`ClienteController`)
+- Service (`ClienteService`)
+- Repository (`ClienteRepository`)
+
+**Requisitos:**
+- Proteção de rotas com autenticação e autorização.
+- Validação dos campos de entrada.
+- Recurso documentado com Swagger e OpenAPI.
