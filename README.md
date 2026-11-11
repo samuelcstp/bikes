@@ -49,3 +49,34 @@ Um cliente só pode ser cadastrado se tiver um `usuário` associado (ou seja, de
 - Proteção de rotas com autenticação e autorização.
 - Validação dos campos de entrada.
 - Recurso documentado com Swagger e OpenAPI.
+
+---
+
+## Atividade 04 - Recurso Bicicleta
+
+Gerenciamento de bicicletas do sistema, acessível apenas por administradores.
+
+**Recurso `Bicicleta`:**
+- `id` (Long)
+- `codigo` (String) — único
+- `status` (Enum: `LIVRE`, `OCUPADA`, `MANUTENCAO`)
+- Campos de auditoria (data de criação, data de modificação, criado por, modificado por)
+
+**Endpoints (`/api/v1/bicicletas`):**
+- `POST /` — cadastra uma bicicleta
+- `GET /{codigo}` — busca pelo código
+- `GET /` — lista todas
+- `PUT /{codigo}` — atualiza dados
+- `DELETE /{codigo}` — remove
+
+**Classes criadas:**
+- `Bicicleta` (entity), `BicicletaStatus` (enum)
+- `BicicletaRequestDTO`, `BicicletaResponseDTO`, `BicicletaMapper`
+- `BicicletaRepository`, `BicicletaService`, `BicicletaController`
+- `CodigoUniqueViolationException` 
+
+**Requisitos:**
+- Acesso restrito ao perfil `ADMIN`.
+- Validação dos campos de entrada.
+- Recurso documentado com Swagger e OpenAPI.
+- Testes de integração (`BicicletaIT`) cobrindo os cenários de CRUD, conflito de código, campos inválidos e acesso não autorizado.
