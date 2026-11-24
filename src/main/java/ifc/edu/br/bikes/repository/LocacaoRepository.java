@@ -18,4 +18,6 @@ public interface LocacaoRepository extends JpaRepository<Locacao, Long> {
                                            @Param("start") LocalDateTime start,
                                            @Param("end") LocalDateTime end,
                                            @Param("activeStatuses") List<LocacaoStatus> activeStatuses);
+
+    boolean existsByBicicletaIdAndStatusIn(Long bicicletaId, List<LocacaoStatus> statuses);
 }

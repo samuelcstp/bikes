@@ -7,6 +7,7 @@ import ifc.edu.br.bikes.exception.LocacaoNotFoundException;
 import ifc.edu.br.bikes.service.LocacaoService;
 import ifc.edu.br.bikes.web.exception.ErrorMessage;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -38,7 +39,7 @@ public class LocacaoController {
             responses = {
                     @ApiResponse(responseCode = "201", description = "Locação solicitada com sucesso",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = LocacaoResponseDto.class))),
-                    @ApiResponse(responseCode = "409", description = "Bicicleta indisponível no período solicitado",
+                    @ApiResponse(responseCode = "409", description = "Bicicleta em manutenção, ocupada ou com locação ativa",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
                     @ApiResponse(responseCode = "422", description = "Dados de entrada inválidos",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
@@ -60,6 +61,10 @@ public class LocacaoController {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = LocacaoResponseDto.class))),
                     @ApiResponse(responseCode = "404", description = "Locação não encontrada",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
+                    @ApiResponse(responseCode = "409", description = "Bicicleta em manutenção",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
+                    @ApiResponse(responseCode = "422", description = "Locação não está no status SOLICITADA",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
                     @ApiResponse(responseCode = "403", description = "Acesso negado — requer perfil ADMIN",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
             })
@@ -70,20 +75,25 @@ public class LocacaoController {
     }
 
     @Operation(summary = "Finalizar locação",
-            description = "Recurso para o cliente autenticado finalizar sua locação em andamento. Define a data de devolução e muda o status para CONCLUIDA. Requer perfil CLIENTE.",
+            description = "Recurso para o cliente autenticado finalizar sua locação em andamento. Calcula o valor por fração de hora (mínimo de uma hora), define a data de devolução e muda o status para CONCLUIDA. Use comProblema=true para enviar a bicicleta à manutenção. Requer perfil CLIENTE.",
             security = @SecurityRequirement(name = "security"),
             responses = {
                     @ApiResponse(responseCode = "200", description = "Locação finalizada com sucesso",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = LocacaoResponseDto.class))),
                     @ApiResponse(responseCode = "404", description = "Locação não encontrada",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
+                    @ApiResponse(responseCode = "422", description = "Locação não está em progresso",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
                     @ApiResponse(responseCode = "403", description = "Acesso negado — requer perfil CLIENTE",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
             })
     @PutMapping("/{id}/finalizar")
     @PreAuthorize("hasRole('CLIENTE')")
-    public ResponseEntity<LocacaoResponseDto> finalizar(@PathVariable Long id) {
-        return ResponseEntity.ok(locacaoService.finalizarLocacao(id));
+    public ResponseEntity<LocacaoResponseDto> finalizar(
+            @PathVariable Long id,
+            @Parameter(description = "Indica que a bicicleta devolvida deve ser encaminhada à manutenção")
+            @RequestParam(defaultValue = "false") boolean comProblema) {
+        return ResponseEntity.ok(locacaoService.finalizarLocacao(id, comProblema));
     }
 
     @Operation(summary = "Cancelar locação",

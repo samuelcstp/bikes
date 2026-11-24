@@ -76,7 +76,8 @@ Gerenciamento de bicicletas do sistema, acessível apenas por administradores.
 - `CodigoUniqueViolationException`
 
 **Requisitos:**
-- Acesso restrito ao perfil `ADMIN`.
+- Cadastro, alteração e exclusão restritos ao perfil `ADMIN`.
+- Consulta (`GET`) disponível para os perfis `ADMIN` e `CLIENTE`, para que o cliente possa verificar o campo `status` e identificar bicicletas `LIVRE`.
 - Validação dos campos de entrada.
 - Recurso documentado com Swagger e OpenAPI.
 - Testes de integração (`BicicletaIT`) cobrindo os cenários de CRUD, conflito de código, campos inválidos e acesso não autorizado.
@@ -101,15 +102,18 @@ Gerenciamento do ciclo de vida completo de uma locação de bicicleta, com contr
 **Endpoints (`/api/v1/locacoes`):**
 - `POST /` — solicita uma nova locação _(perfil: CLIENTE)_
 - `PUT /{id}/iniciar` — inicia a locação, registra `dataRetirada` e status `EM_PROGRESSO` _(perfil: ADMIN)_
-- `PUT /{id}/finalizar` — finaliza a locação, registra `dataDevolucao` e status `CONCLUIDA` _(perfil: CLIENTE)_
+- `PUT /{id}/finalizar?comProblema=false` — finaliza a locação, registra `dataDevolucao`, calcula `valor` e altera o status para `CONCLUIDA` _(perfil: CLIENTE)_
 - `PUT /{id}/cancelar` — cancela a locação _(perfil: ADMIN ou CLIENTE)_
 - `GET /{id}` — busca locação por ID _(perfil: ADMIN ou CLIENTE)_
 - `GET /` — lista todas as locações _(perfil: ADMIN)_
 
 **Regras de negócio:**
-- Uma locação só pode ser solicitada se a bicicleta estiver disponível no período informado (sem conflito com locações `SOLICITADA` ou `EM_PROGRESSO`).
+- Uma locação só pode ser solicitada para uma bicicleta com status `LIVRE`. A solicitação já reserva a bicicleta, mudando seu status para `OCUPADA`.
+- Uma bicicleta não pode ter mais de uma locação com status `SOLICITADA` ou `EM_PROGRESSO`, independentemente das datas informadas. Bicicletas em `MANUTENCAO` também não podem ser solicitadas.
 - O status segue o fluxo: `SOLICITADA` → `EM_PROGRESSO` → `CONCLUIDA` (ou `CANCELADA` a qualquer momento antes de concluída).
 - Locações já `CONCLUIDA` não podem ser canceladas.
+- Ao concluir, a bicicleta volta a `LIVRE`; ao finalizar com `comProblema=true`, ela passa para `MANUTENCAO`.
+- O valor é calculado na finalização com tarifa padrão de R$ 10,00 por hora, cobrando no mínimo uma hora e arredondando qualquer fração para a próxima hora. A tarifa pode ser configurada em `locacao.valor-hora`.
 
 **Classes criadas/modificadas:**
 - `Locacao` (entity), `LocacaoStatus` (enum)
@@ -163,12 +167,20 @@ curl -s -X POST http://localhost:8080/api/v1/locacoes \
   -H "Authorization: Bearer TOKEN_CLIENTE" \
   -d '{"clienteId":1,"bicicletaId":1,"dataPrevistaDevolucao":"2026-11-25T10:00:00","numeroCartao":"1234567890123456","cvv":123,"mesExpiracao":12,"anoExpiracao":2028}'
 
+# 8.1 Consultar bicicletas e seus status (usar TOKEN_CLIENTE)
+curl -s http://localhost:8080/api/v1/bicicletas \
+  -H "Authorization: Bearer TOKEN_CLIENTE"
+
 # 9. Iniciar locação (usar TOKEN_ADMIN)
 curl -s -X PUT http://localhost:8080/api/v1/locacoes/1/iniciar \
   -H "Authorization: Bearer TOKEN_ADMIN"
 
-# 10. Finalizar locação (usar TOKEN_CLIENTE)
+# 10. Finalizar locação e liberar bicicleta (usar TOKEN_CLIENTE)
 curl -s -X PUT http://localhost:8080/api/v1/locacoes/1/finalizar \
+  -H "Authorization: Bearer TOKEN_CLIENTE"
+
+# Para devolver uma bicicleta com problema, encaminhando-a à manutenção:
+curl -s -X PUT "http://localhost:8080/api/v1/locacoes/1/finalizar?comProblema=true" \
   -H "Authorization: Bearer TOKEN_CLIENTE"
 ```
 
