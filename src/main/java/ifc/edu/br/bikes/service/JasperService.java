@@ -1,30 +1,37 @@
 package ifc.edu.br.bikes.service;
 
 import net.sf.jasperreports.engine.*;
-import net.sf.jasperreports.engine.util.JRLoader;
-import net.sf.jasperreports.export.*;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
+import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
+import javax.sql.DataSource;
 
 @Service
 public class JasperService {
+    private final DataSource dataSource;
+
+    public JasperService(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
     public byte[] generatePdf() {
-        try {
-            // load compiled Jasper file from resources
-            ClassPathResource resource = new ClassPathResource("reports/locacoes_report.jasper");
-            try (InputStream is = resource.getInputStream()) {
-                JasperReport jasperReport = (JasperReport) JRLoader.loadObject(is);
-                // parameters (path for images)
+        ClassPathResource reportResource = new ClassPathResource("reports/locacoes_report.jrxml");
+        ClassPathResource reportsDirectory = new ClassPathResource("reports/");
+
+        try (InputStream reportStream = reportResource.getInputStream();
+             Connection connection = dataSource.getConnection()) {
+                // Compile the current template, so its fields and image settings stay in sync.
+                JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
                 Map<String, Object> params = new HashMap<>();
-                params.put("IMG_DIR", new ClassPathResource("reports/").getURL().toString());
-                // using empty datasource because the query is embedded in the .jasper file
-                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, params, new JREmptyDataSource());
+                params.put("REPORT_ROOT_DIR", reportsDirectory.getURL().toString());
+
+                // The SQL query declared in the report runs on the application's database.
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, params, connection);
                 return JasperExportManager.exportReportToPdf(jasperPrint);
-            }
         } catch (Exception e) {
             throw new RuntimeException("Erro ao gerar relatório", e);
         }

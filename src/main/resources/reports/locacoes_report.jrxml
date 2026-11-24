@@ -1,0 +1,165 @@
+<!-- Created with Jaspersoft Studio version 7.0.8.final using JasperReports Library version 7.0.8-6f896111  -->
+<jasperReport name="locacoes_report" language="java" columnCount="1" pageWidth="842" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="caaa7351-7ff1-4a34-95c2-9fe15a71f9ba">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="BikesDB"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<parameter name="REPORT_ROOT_DIR" class="java.lang.String"/>
+	<query language="sql"><![CDATA[SELECT
+    l.id AS id,
+    c.nome AS cliente,
+    c.cpf AS cpf,
+    b.codigo AS bicicleta,
+    l.data_retirada AS dataRetirada,
+    l.data_prevista_devolucao AS dataPrevistaDevolucao,
+    l.data_devolucao AS dataDevolucao,
+    l.status AS status,
+    l.valor AS valor
+FROM locacoes l
+INNER JOIN clientes c ON l.cliente_id = c.id
+INNER JOIN bicicletas b ON l.bicicleta_id = b.id
+ORDER BY l.id DESC]]></query>
+	<field name="id" class="java.lang.Long">
+		<property name="com.jaspersoft.studio.field.name" value="id"/>
+		<property name="com.jaspersoft.studio.field.label" value="id"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="locacoes"/>
+	</field>
+	<field name="cliente" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="nome"/>
+		<property name="com.jaspersoft.studio.field.label" value="cliente"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="clientes"/>
+	</field>
+	<field name="cpf" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="cpf"/>
+		<property name="com.jaspersoft.studio.field.label" value="cpf"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="clientes"/>
+	</field>
+	<field name="bicicleta" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="codigo"/>
+		<property name="com.jaspersoft.studio.field.label" value="bicicleta"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="bicicletas"/>
+	</field>
+	<field name="dataRetirada" class="java.time.LocalDateTime">
+		<property name="com.jaspersoft.studio.field.name" value="data_retirada"/>
+		<property name="com.jaspersoft.studio.field.label" value="dataRetirada"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="locacoes"/>
+	</field>
+	<field name="dataPrevistaDevolucao" class="java.time.LocalDateTime">
+		<property name="com.jaspersoft.studio.field.name" value="data_prevista_devolucao"/>
+		<property name="com.jaspersoft.studio.field.label" value="dataPrevistaDevolucao"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="locacoes"/>
+	</field>
+	<field name="dataDevolucao" class="java.time.LocalDateTime">
+		<property name="com.jaspersoft.studio.field.name" value="data_devolucao"/>
+		<property name="com.jaspersoft.studio.field.label" value="dataDevolucao"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="locacoes"/>
+	</field>
+	<field name="status" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="status"/>
+		<property name="com.jaspersoft.studio.field.label" value="status"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="locacoes"/>
+	</field>
+	<field name="valor" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="valor"/>
+		<property name="com.jaspersoft.studio.field.label" value="valor"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="locacoes"/>
+	</field>
+	<background splitType="Stretch"/>
+	<title height="79" splitType="Stretch">
+		<element kind="image" uuid="7f008341-272a-4fac-bd8c-5eff3c61df1e" x="240" y="20" width="50" height="50" onErrorType="Blank">
+			<expression><![CDATA[$P{REPORT_ROOT_DIR} + "images/logo.png"]]></expression>
+		</element>
+		<element kind="staticText" uuid="5e8f6eab-f9b4-48ec-b295-a9b84a933cb9" x="329" y="30" width="171" height="30">
+			<text><![CDATA[Relatório de Locações e Devoluções]]></text>
+		</element>
+	</title>
+	<pageHeader height="35" splitType="Stretch"/>
+	<columnHeader height="67" splitType="Stretch">
+		<element kind="staticText" uuid="e8e7056d-4fad-48a8-9e15-0048d69a442e" x="-14" y="0" width="73" height="30">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="8be47ab2-4453-4b10-8ed7-9d3c3222733e"/>
+			<text><![CDATA[id]]></text>
+		</element>
+		<element kind="staticText" uuid="ceb8b285-2b00-4c05-b9f4-5675c677bcc1" x="70" y="0" width="100" height="30">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a477cb67-2aa9-4ec5-ba3d-2cd59dfbda65"/>
+			<text><![CDATA[cliente]]></text>
+		</element>
+		<element kind="staticText" uuid="e82beece-39e6-486b-b381-db787853d06f" x="180" y="0" width="100" height="30">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a92b05f8-3520-48e2-bc34-8f8533095402"/>
+			<text><![CDATA[cpf]]></text>
+		</element>
+		<element kind="staticText" uuid="39c9d4e1-5f27-461e-953e-fee19293f1ee" x="290" y="0" width="100" height="30">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="142ac0a7-2151-4641-886f-351ea7617bbc"/>
+			<text><![CDATA[bicicleta]]></text>
+		</element>
+		<element kind="staticText" uuid="9ce2c82f-2ec1-4855-a731-4ac4f10cecb2" x="400" y="0" width="100" height="30">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c3b3fcbc-f490-4ad6-9e73-dc416866c683"/>
+			<text><![CDATA[dataRetirada]]></text>
+		</element>
+		<element kind="staticText" uuid="0cf34853-c539-4d16-b534-1b291a198053" x="510" y="0" width="60" height="30">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="fe5d3f74-18c6-4b94-9385-0e6e8f733167"/>
+			<text><![CDATA[dataPrevistaDevolucao]]></text>
+		</element>
+		<element kind="staticText" uuid="5c8861b6-c608-4169-b6b9-29ac380bebff" x="580" y="0" width="80" height="30">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a4ec87af-75e9-48eb-80d9-a2d6ea315b32"/>
+			<text><![CDATA[dataDevolucao]]></text>
+		</element>
+		<element kind="staticText" uuid="1095541f-a936-4575-8550-ece40f34bc03" x="670" y="0" width="70" height="30">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1963beef-c9bc-4216-9885-1f18772f342b"/>
+			<text><![CDATA[status]]></text>
+		</element>
+		<element kind="staticText" uuid="30e25727-1dea-4046-b419-c7d1269487d4" x="750" y="0" width="60" height="30">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="fdcf47cf-0459-42c4-b97b-e11ad18ef438"/>
+			<text><![CDATA[valor]]></text>
+		</element>
+	</columnHeader>
+	<detail>
+		<band height="102" splitType="Stretch">
+			<element kind="textField" uuid="b7c0f190-318a-4b6f-9ec0-aa5c6c5f0921" x="-11" y="0" width="72" height="30">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="8be47ab2-4453-4b10-8ed7-9d3c3222733e"/>
+				<expression><![CDATA[$F{id}]]></expression>
+			</element>
+			<element kind="textField" uuid="60ebf60a-2b64-4490-8919-f7a87f6e2648" x="70" y="0" width="100" height="30">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a477cb67-2aa9-4ec5-ba3d-2cd59dfbda65"/>
+				<expression><![CDATA[$F{cliente}]]></expression>
+			</element>
+			<element kind="textField" uuid="45a14844-c77f-4be0-b810-c2e07ffda6a2" x="180" y="0" width="100" height="30">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a92b05f8-3520-48e2-bc34-8f8533095402"/>
+				<expression><![CDATA[$F{cpf}]]></expression>
+			</element>
+			<element kind="textField" uuid="d931515f-8d40-4d2f-8eaf-7cd976d3caf6" x="290" y="0" width="100" height="30">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="142ac0a7-2151-4641-886f-351ea7617bbc"/>
+				<expression><![CDATA[$F{bicicleta}]]></expression>
+			</element>
+			<element kind="textField" uuid="0a203db4-ec36-4562-8d7b-18b3ff4c8354" x="400" y="0" width="100" height="30">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c3b3fcbc-f490-4ad6-9e73-dc416866c683"/>
+				<expression><![CDATA[$F{dataRetirada}]]></expression>
+			</element>
+			<element kind="textField" uuid="c90953a0-2497-462e-94ab-85e4d89e6a70" x="510" y="0" width="60" height="50">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="fe5d3f74-18c6-4b94-9385-0e6e8f733167"/>
+				<expression><![CDATA[$F{dataPrevistaDevolucao}]]></expression>
+			</element>
+			<element kind="textField" uuid="a637c4f2-ee8b-45a8-b378-ac9ff88314e2" x="580" y="0" width="80" height="30">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a4ec87af-75e9-48eb-80d9-a2d6ea315b32"/>
+				<expression><![CDATA[$F{dataDevolucao}]]></expression>
+			</element>
+			<element kind="textField" uuid="a61bd6ef-0c93-4fcd-a9a0-14970cc4fa32" x="670" y="0" width="70" height="30">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1963beef-c9bc-4216-9885-1f18772f342b"/>
+				<expression><![CDATA[$F{status}]]></expression>
+			</element>
+			<element kind="textField" uuid="f78404a4-6808-44eb-be57-8b91623272f6" x="750" y="0" width="59" height="30">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="fdcf47cf-0459-42c4-b97b-e11ad18ef438"/>
+				<expression><![CDATA[$F{valor}]]></expression>
+			</element>
+		</band>
+	</detail>
+	<columnFooter height="45" splitType="Stretch"/>
+	<pageFooter height="54" splitType="Stretch"/>
+	<summary height="42" splitType="Stretch"/>
+</jasperReport>
