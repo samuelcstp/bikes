@@ -6,7 +6,7 @@ import ifc.edu.br.bikes.exception.BicicletaIndisponivelException;
 import ifc.edu.br.bikes.exception.LocacaoNotFoundException;
 import ifc.edu.br.bikes.entity.Bicicleta;
 import ifc.edu.br.bikes.entity.Cliente;
-import ifc.edu.br.bikes.model.Locacao;
+import ifc.edu.br.bikes.entity.Locacao;
 import ifc.edu.br.bikes.model.LocacaoStatus;
 import ifc.edu.br.bikes.repository.BicicletaRepository;
 import ifc.edu.br.bikes.repository.ClienteRepository;

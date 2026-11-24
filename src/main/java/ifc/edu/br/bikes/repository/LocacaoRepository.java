@@ -1,6 +1,6 @@
 package ifc.edu.br.bikes.repository;
 
-import ifc.edu.br.bikes.model.Locacao;
+import ifc.edu.br.bikes.entity.Locacao;
 import ifc.edu.br.bikes.model.LocacaoStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

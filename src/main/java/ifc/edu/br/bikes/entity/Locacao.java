@@ -1,4 +1,4 @@
-package ifc.edu.br.bikes.model;
+package ifc.edu.br.bikes.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,16 +8,19 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import ifc.edu.br.bikes.entity.Cliente;
 import ifc.edu.br.bikes.entity.Bicicleta;
+import ifc.edu.br.bikes.model.LocacaoStatus;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "locacoes")
+@EntityListeners(AuditingEntityListener.class)
 public class Locacao {
 
     @Id
@@ -32,7 +35,7 @@ public class Locacao {
     @JoinColumn(name = "bicicleta_id", nullable = false)
     private Bicicleta bicicleta;
 
-    @Column(name = "data_retirada", nullable = false)
+    @Column(name = "data_retirada")
     private LocalDateTime dataRetirada;
 
     @Column(name = "data_prevista_devolucao", nullable = false)
@@ -44,6 +47,12 @@ public class Locacao {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private LocacaoStatus status;
+
+    @Column(name = "valor")
+    private java.math.BigDecimal valor;
+
+    @Transient
+    private java.time.Duration duracao;
 
     // Auditoria
     @CreatedDate

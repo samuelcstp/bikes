@@ -73,10 +73,103 @@ Gerenciamento de bicicletas do sistema, acessível apenas por administradores.
 - `Bicicleta` (entity), `BicicletaStatus` (enum)
 - `BicicletaRequestDTO`, `BicicletaResponseDTO`, `BicicletaMapper`
 - `BicicletaRepository`, `BicicletaService`, `BicicletaController`
-- `CodigoUniqueViolationException` 
+- `CodigoUniqueViolationException`
 
 **Requisitos:**
 - Acesso restrito ao perfil `ADMIN`.
 - Validação dos campos de entrada.
 - Recurso documentado com Swagger e OpenAPI.
 - Testes de integração (`BicicletaIT`) cobrindo os cenários de CRUD, conflito de código, campos inválidos e acesso não autorizado.
+
+---
+
+## Atividade 08 - Recurso Locação
+
+Gerenciamento do ciclo de vida completo de uma locação de bicicleta, com controle de status e dados de pagamento simplificado.
+
+**Recurso `Locacao`:**
+- `id` (Long)
+- `cliente` (FK → Cliente)
+- `bicicleta` (FK → Bicicleta)
+- `dataRetirada` (LocalDateTime) — preenchida ao iniciar a locação
+- `dataPrevistaDevolucao` (LocalDateTime) — obrigatória na criação
+- `dataDevolucao` (LocalDateTime) — preenchida ao finalizar
+- `status` (Enum: `SOLICITADA`, `EM_PROGRESSO`, `CONCLUIDA`, `CANCELADA`)
+- `valor` (BigDecimal)
+- Campos de auditoria (data de criação, data de modificação, criado por, modificado por)
+
+**Endpoints (`/api/v1/locacoes`):**
+- `POST /` — solicita uma nova locação _(perfil: CLIENTE)_
+- `PUT /{id}/iniciar` — inicia a locação, registra `dataRetirada` e status `EM_PROGRESSO` _(perfil: ADMIN)_
+- `PUT /{id}/finalizar` — finaliza a locação, registra `dataDevolucao` e status `CONCLUIDA` _(perfil: CLIENTE)_
+- `PUT /{id}/cancelar` — cancela a locação _(perfil: ADMIN ou CLIENTE)_
+- `GET /{id}` — busca locação por ID _(perfil: ADMIN ou CLIENTE)_
+- `GET /` — lista todas as locações _(perfil: ADMIN)_
+
+**Regras de negócio:**
+- Uma locação só pode ser solicitada se a bicicleta estiver disponível no período informado (sem conflito com locações `SOLICITADA` ou `EM_PROGRESSO`).
+- O status segue o fluxo: `SOLICITADA` → `EM_PROGRESSO` → `CONCLUIDA` (ou `CANCELADA` a qualquer momento antes de concluída).
+- Locações já `CONCLUIDA` não podem ser canceladas.
+
+**Classes criadas/modificadas:**
+- `Locacao` (entity), `LocacaoStatus` (enum)
+- `LocacaoCreateDto`, `LocacaoResponseDto`, `LocacaoMapper`
+- `LocacaoRepository`, `LocacaoService`, `LocacaoController`
+- `BicicletaIndisponivelException`, `LocacaoNotFoundException`
+- Adicionada anotação `@EntityListeners(AuditingEntityListener.class)` na entidade `Locacao` para auditoria automática.
+
+**Fluxo completo via curl:**
+
+```bash
+# 1. Criar usuário admin
+curl -s -X POST http://localhost:8080/api/v1/usuarios \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin@example.com","password":"admin1"}'
+
+# 2. Promover para ADMIN no banco
+mysql -u samuel -psamuel118 -D bikes \
+  -e "UPDATE usuarios SET role='ADMIN' WHERE username='admin@example.com';"
+
+# 3. Login admin → guardar TOKEN_ADMIN
+curl -s -X POST http://localhost:8080/api/v1/auth \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin@example.com","password":"admin1"}'
+
+# 4. Criar usuário cliente
+curl -s -X POST http://localhost:8080/api/v1/usuarios \
+  -H "Content-Type: application/json" \
+  -d '{"username":"cliente@example.com","password":"clien1"}'
+
+# 5. Login cliente → guardar TOKEN_CLIENTE
+curl -s -X POST http://localhost:8080/api/v1/auth \
+  -H "Content-Type: application/json" \
+  -d '{"username":"cliente@example.com","password":"clien1"}'
+
+# 6. Criar entidade cliente (usar TOKEN_CLIENTE)
+curl -s -X POST http://localhost:8080/api/v1/clientes \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer TOKEN_CLIENTE" \
+  -d '{"nome":"João da Silva","cpf":"52998224725"}'
+
+# 7. Criar bicicleta (usar TOKEN_ADMIN)
+curl -s -X POST http://localhost:8080/api/v1/bicicletas \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer TOKEN_ADMIN" \
+  -d '{"codigo":"BIKE-001","status":"LIVRE"}'
+
+# 8. Solicitar locação (usar TOKEN_CLIENTE)
+curl -s -X POST http://localhost:8080/api/v1/locacoes \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer TOKEN_CLIENTE" \
+  -d '{"clienteId":1,"bicicletaId":1,"dataPrevistaDevolucao":"2026-11-25T10:00:00","numeroCartao":"1234567890123456","cvv":123,"mesExpiracao":12,"anoExpiracao":2028}'
+
+# 9. Iniciar locação (usar TOKEN_ADMIN)
+curl -s -X PUT http://localhost:8080/api/v1/locacoes/1/iniciar \
+  -H "Authorization: Bearer TOKEN_ADMIN"
+
+# 10. Finalizar locação (usar TOKEN_CLIENTE)
+curl -s -X PUT http://localhost:8080/api/v1/locacoes/1/finalizar \
+  -H "Authorization: Bearer TOKEN_CLIENTE"
+```
+
+**Documentação da API:** `http://localhost:8080/docs-bikes.html`

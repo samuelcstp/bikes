@@ -2,7 +2,7 @@ package ifc.edu.br.bikes.dto.mapper;
 
 import ifc.edu.br.bikes.dto.LocacaoCreateDto;
 import ifc.edu.br.bikes.dto.LocacaoResponseDto;
-import ifc.edu.br.bikes.model.Locacao;
+import ifc.edu.br.bikes.entity.Locacao;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
