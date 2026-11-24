@@ -3,12 +3,13 @@ package ifc.edu.br.bikes.web.controller;
 import ifc.edu.br.bikes.dto.BicicletaRequestDTO;
 import ifc.edu.br.bikes.dto.BicicletaResponseDTO;
 import ifc.edu.br.bikes.service.BicicletaService;
-import ifc.edu.br.bikes.web.excpetion.ErrorMessage;
+import ifc.edu.br.bikes.web.exception.ErrorMessage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,49 +29,65 @@ public class BicicletaController {
 
     private final BicicletaService bicicletaService;
 
-    @Operation(summary = "Cadastrar bicicleta", responses = {
-            @ApiResponse(responseCode = "201", description = "Bicicleta criada",
-                    content = @Content(schema = @Schema(implementation = BicicletaResponseDTO.class))),
-            @ApiResponse(responseCode = "409", description = "Código já cadastrado",
-                    content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
-            @ApiResponse(responseCode = "422", description = "Dados inválidos",
-                    content = @Content(schema = @Schema(implementation = ErrorMessage.class)))
-    })
+    @Operation(summary = "Cadastrar bicicleta",
+            security = @SecurityRequirement(name = "security"),
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "Bicicleta criada",
+                            content = @Content(schema = @Schema(implementation = BicicletaResponseDTO.class))),
+                    @ApiResponse(responseCode = "409", description = "Código já cadastrado",
+                            content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
+                    @ApiResponse(responseCode = "422", description = "Dados inválidos",
+                            content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
+                    @ApiResponse(responseCode = "403", description = "Usuário sem permissão para acessar este recurso",
+                            content = @Content(schema = @Schema(implementation = ErrorMessage.class)))
+            })
     @PostMapping
     public ResponseEntity<BicicletaResponseDTO> create(@Valid @RequestBody BicicletaRequestDTO request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(bicicletaService.create(request));
     }
 
-    @Operation(summary = "Localizar bicicleta pelo código", responses = {
-            @ApiResponse(responseCode = "200", description = "Bicicleta localizada",
-                    content = @Content(schema = @Schema(implementation = BicicletaResponseDTO.class))),
-            @ApiResponse(responseCode = "404", description = "Bicicleta não encontrada",
-                    content = @Content(schema = @Schema(implementation = ErrorMessage.class)))
-    })
+    @Operation(summary = "Localizar bicicleta pelo código",
+            security = @SecurityRequirement(name = "security"),
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Bicicleta localizada",
+                            content = @Content(schema = @Schema(implementation = BicicletaResponseDTO.class))),
+                    @ApiResponse(responseCode = "404", description = "Bicicleta não encontrada",
+                            content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
+                    @ApiResponse(responseCode = "403", description = "Usuário sem permissão para acessar este recurso",
+                            content = @Content(schema = @Schema(implementation = ErrorMessage.class)))
+            })
     @GetMapping("/{codigo}")
     public ResponseEntity<BicicletaResponseDTO> getByCodigo(@PathVariable String codigo) {
         return ResponseEntity.ok(bicicletaService.getByCodigo(codigo));
     }
 
-    @Operation(summary = "Listar bicicletas", responses = {
-            @ApiResponse(responseCode = "200", description = "Bicicletas cadastradas",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = BicicletaResponseDTO.class))))
-    })
+    @Operation(summary = "Listar bicicletas",
+            security = @SecurityRequirement(name = "security"),
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Bicicletas cadastradas",
+                            content = @Content(array = @ArraySchema(schema = @Schema(implementation = BicicletaResponseDTO.class)))),
+                    @ApiResponse(responseCode = "403", description = "Usuário sem permissão para acessar este recurso",
+                            content = @Content(schema = @Schema(implementation = ErrorMessage.class)))
+            })
     @GetMapping
     public ResponseEntity<List<BicicletaResponseDTO>> getAll() {
         return ResponseEntity.ok(bicicletaService.getAll());
     }
 
-    @Operation(summary = "Atualizar bicicleta", responses = {
-            @ApiResponse(responseCode = "200", description = "Bicicleta atualizada",
-                    content = @Content(schema = @Schema(implementation = BicicletaResponseDTO.class))),
-            @ApiResponse(responseCode = "404", description = "Bicicleta não encontrada",
-                    content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
-            @ApiResponse(responseCode = "409", description = "Código já cadastrado",
-                    content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
-            @ApiResponse(responseCode = "422", description = "Dados inválidos",
-                    content = @Content(schema = @Schema(implementation = ErrorMessage.class)))
-    })
+    @Operation(summary = "Atualizar bicicleta",
+            security = @SecurityRequirement(name = "security"),
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Bicicleta atualizada",
+                            content = @Content(schema = @Schema(implementation = BicicletaResponseDTO.class))),
+                    @ApiResponse(responseCode = "404", description = "Bicicleta não encontrada",
+                            content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
+                    @ApiResponse(responseCode = "409", description = "Código já cadastrado",
+                            content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
+                    @ApiResponse(responseCode = "422", description = "Dados inválidos",
+                            content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
+                    @ApiResponse(responseCode = "403", description = "Usuário sem permissão para acessar este recurso",
+                            content = @Content(schema = @Schema(implementation = ErrorMessage.class)))
+            })
     @PutMapping("/{codigo}")
     public ResponseEntity<BicicletaResponseDTO> update(
             @PathVariable String codigo,
@@ -78,11 +95,15 @@ public class BicicletaController {
         return ResponseEntity.ok(bicicletaService.update(codigo, request));
     }
 
-    @Operation(summary = "Excluir bicicleta", responses = {
-            @ApiResponse(responseCode = "204", description = "Bicicleta excluída"),
-            @ApiResponse(responseCode = "404", description = "Bicicleta não encontrada",
-                    content = @Content(schema = @Schema(implementation = ErrorMessage.class)))
-    })
+    @Operation(summary = "Excluir bicicleta",
+            security = @SecurityRequirement(name = "security"),
+            responses = {
+                    @ApiResponse(responseCode = "204", description = "Bicicleta excluída"),
+                    @ApiResponse(responseCode = "404", description = "Bicicleta não encontrada",
+                            content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
+                    @ApiResponse(responseCode = "403", description = "Usuário sem permissão para acessar este recurso",
+                            content = @Content(schema = @Schema(implementation = ErrorMessage.class)))
+            })
     @DeleteMapping("/{codigo}")
     public ResponseEntity<Void> delete(@PathVariable String codigo) {
         bicicletaService.delete(codigo);

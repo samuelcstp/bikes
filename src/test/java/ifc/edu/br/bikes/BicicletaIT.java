@@ -4,7 +4,7 @@ import ifc.edu.br.bikes.dto.BicicletaRequestDTO;
 import ifc.edu.br.bikes.dto.BicicletaResponseDTO;
 import ifc.edu.br.bikes.entity.BicicletaStatus;
 import ifc.edu.br.bikes.jwt.JwtUtils;
-import ifc.edu.br.bikes.web.excpetion.ErrorMessage;
+import ifc.edu.br.bikes.web.exception.ErrorMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

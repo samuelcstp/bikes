@@ -5,9 +5,9 @@ import ifc.edu.br.bikes.dto.UsuarioResponseDTO;
 import ifc.edu.br.bikes.dto.UsuarioSenhaDTO;
 import ifc.edu.br.bikes.dto.mapper.UsuarioMapper;
 import ifc.edu.br.bikes.entity.Usuario;
-import ifc.edu.br.bikes.exception.EntityNotFoundExcpetion;
+import ifc.edu.br.bikes.exception.EntityNotFoundException;
 import ifc.edu.br.bikes.exception.PasswordInvalidException;
-import ifc.edu.br.bikes.exception.UsernameUniqueViolationExcpetion;
+import ifc.edu.br.bikes.exception.UsernameUniqueViolationException;
 import ifc.edu.br.bikes.jwt.JwtAuthorizationFilter;
 import ifc.edu.br.bikes.jwt.JwtUserDetailsService;
 import ifc.edu.br.bikes.repository.UsuarioRepository;
@@ -32,21 +32,21 @@ public class UsuarioService {
             usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
             return usuarioMapper.toResponse(usuarioRepository.save(usuario));
         } catch (RuntimeException ex) {
-            throw new UsernameUniqueViolationExcpetion(String.format("O username '%s' já existe.", usuarioRequestDTO.username()));
+            throw new UsernameUniqueViolationException(String.format("O username '%s' já existe.", usuarioRequestDTO.username()));
         }
     }
 
     @Transactional()
     public UsuarioResponseDTO getById(Long id){
         return usuarioMapper.toResponse(usuarioRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundExcpetion(String.format("O usuário com id '%d' não encontrado.", id))
+                () -> new EntityNotFoundException(String.format("O usuário com id '%d' não encontrado.", id))
         ));
     }
 
     @Transactional
     public void updatePassword(Long id, UsuarioSenhaDTO usuarioSenhaDTO){
         Usuario usuario = usuarioRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundExcpetion(String.format("O usuário com id '%d' não encontrado.", id))
+                () -> new EntityNotFoundException(String.format("O usuário com id '%d' não encontrado.", id))
         );
 
         // validação da senha atual com o passwordEncoder
@@ -70,13 +70,13 @@ public class UsuarioService {
     @Transactional
     public Usuario buscarPorNome(String username) {
         return usuarioRepository.findByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundExcpetion(String.format("Usuário '%s' não encontrado", username)));
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Usuário '%s' não encontrado", username)));
     }
 
     @Transactional
     public Usuario buscarPorId(Long id) {
         return usuarioRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundExcpetion(String.format("Usuário id=%d não encontrado", id)));
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Usuário id=%d não encontrado", id)));
     }
 
     public Usuario.Role buscarRolePorUsername(String username) {

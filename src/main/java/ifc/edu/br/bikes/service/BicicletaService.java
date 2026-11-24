@@ -5,7 +5,7 @@ import ifc.edu.br.bikes.dto.BicicletaResponseDTO;
 import ifc.edu.br.bikes.dto.mapper.BicicletaMapper;
 import ifc.edu.br.bikes.entity.Bicicleta;
 import ifc.edu.br.bikes.exception.CodigoUniqueViolationException;
-import ifc.edu.br.bikes.exception.EntityNotFoundExcpetion;
+import ifc.edu.br.bikes.exception.EntityNotFoundException;
 import ifc.edu.br.bikes.repository.BicicletaRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +39,7 @@ public class BicicletaService {
     public BicicletaResponseDTO getByCodigo(String codigo) {
         return bicicletaRepository.findByCodigo(codigo)
                 .map(bicicletaMapper::toResponse)
-                .orElseThrow(() -> new EntityNotFoundExcpetion(String.format("Bicicleta com código '%s' não encontrada", codigo)));
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Bicicleta com código '%s' não encontrada", codigo)));
     }
 
     @Transactional
@@ -50,7 +50,7 @@ public class BicicletaService {
     @Transactional
     public BicicletaResponseDTO update(String codigo, BicicletaRequestDTO request) {
         Bicicleta bicicleta = bicicletaRepository.findByCodigo(codigo)
-                .orElseThrow(() -> new EntityNotFoundExcpetion(String.format("Bicicleta com código '%s' não encontrada", codigo)));
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Bicicleta com código '%s' não encontrada", codigo)));
 
         if (!request.codigo().equals(codigo) && bicicletaRepository.existsByCodigo(request.codigo())) {
             throw new CodigoUniqueViolationException(String.format("Bicicleta com código '%s' já cadastrada no sistema", request.codigo()));
@@ -65,7 +65,7 @@ public class BicicletaService {
     @Transactional
     public void delete(String codigo) {
         Bicicleta bicicleta = bicicletaRepository.findByCodigo(codigo)
-                .orElseThrow(() -> new EntityNotFoundExcpetion(String.format("Bicicleta com código '%s' não encontrada", codigo)));
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Bicicleta com código '%s' não encontrada", codigo)));
 
         bicicletaRepository.delete(bicicleta);
     }

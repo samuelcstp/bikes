@@ -6,7 +6,7 @@ import ifc.edu.br.bikes.dto.mapper.ClienteMapper;
 import ifc.edu.br.bikes.entity.Cliente;
 import ifc.edu.br.bikes.entity.Usuario;
 import ifc.edu.br.bikes.exception.CpfUniqueViolationException;
-import ifc.edu.br.bikes.exception.EntityNotFoundExcpetion;
+import ifc.edu.br.bikes.exception.EntityNotFoundException;
 import ifc.edu.br.bikes.repository.ClienteRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -50,14 +50,14 @@ public class ClienteService {
     public ClienteResponseDto getById(Long id) {
         return clienteRepository.findById(id)
                 .map(clienteMapper::toResponse)
-                .orElseThrow(() -> new EntityNotFoundExcpetion(String.format("Cliente id=%d não encontrado", id)));
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Cliente id=%d não encontrado", id)));
     }
 
     @Transactional
     public ClienteResponseDto getByUsuarioId(Long usuarioId) {
         return clienteRepository.findByUsuarioId(usuarioId)
                 .map(clienteMapper::toResponse)
-                .orElseThrow(() -> new EntityNotFoundExcpetion(String.format("Cliente não encontrado para o usuário id=%d", usuarioId)));
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Cliente não encontrado para o usuário id=%d", usuarioId)));
     }
 
     @Transactional

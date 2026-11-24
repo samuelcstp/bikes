@@ -3,7 +3,7 @@ package ifc.edu.br.bikes.web.controller;
 import ifc.edu.br.bikes.dto.UsuarioLoginDto;
 import ifc.edu.br.bikes.jwt.JwtToken;
 import ifc.edu.br.bikes.jwt.JwtUserDetailsService;
-import ifc.edu.br.bikes.web.excpetion.ErrorMessage;
+import ifc.edu.br.bikes.web.exception.ErrorMessage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

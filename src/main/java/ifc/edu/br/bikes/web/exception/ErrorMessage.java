@@ -1,4 +1,4 @@
-package ifc.edu.br.bikes.web.excpetion;
+package ifc.edu.br.bikes.web.exception;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.servlet.http.HttpServletRequest;

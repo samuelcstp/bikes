@@ -4,7 +4,7 @@ import ifc.edu.br.bikes.dto.UsuarioRequestDTO;
 import ifc.edu.br.bikes.dto.UsuarioResponseDTO;
 import ifc.edu.br.bikes.dto.UsuarioSenhaDTO;
 import ifc.edu.br.bikes.service.UsuarioService;
-import ifc.edu.br.bikes.web.excpetion.ErrorMessage;
+import ifc.edu.br.bikes.web.exception.ErrorMessage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
