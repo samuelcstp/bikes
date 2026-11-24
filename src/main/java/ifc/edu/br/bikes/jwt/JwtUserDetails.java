@@ -8,7 +8,12 @@ public class JwtUserDetails extends User {
     private Usuario usuario;
 
     public JwtUserDetails(Usuario usuario){
-        super(usuario.getUsername(), usuario.getPassword(), AuthorityUtils.createAuthorityList(usuario.getRole().name()));
+        super(usuario.getUsername(), usuario.getPassword(),
+                AuthorityUtils.createAuthorityList(
+                        "ROLE_" + (usuario.getRole().name().startsWith("ROLE_") ? usuario.getRole().name().substring(5) : usuario.getRole().name()),
+                        usuario.getRole().name().startsWith("ROLE_") ? usuario.getRole().name().substring(5) : usuario.getRole().name()
+                )
+        );
         this.usuario = usuario;
     }
 
@@ -17,6 +22,7 @@ public class JwtUserDetails extends User {
     }
 
     public String getRole(){
-        return this.usuario.getRole().name();
+        String role = this.usuario.getRole().name();
+        return role.startsWith("ROLE_") ? role.substring(5) : role;
     }
 }

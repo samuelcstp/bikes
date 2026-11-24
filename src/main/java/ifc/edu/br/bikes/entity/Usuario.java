@@ -3,6 +3,12 @@ package ifc.edu.br.bikes.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -10,8 +16,10 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "usuarios")
+@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
+@ToString
 public class Usuario implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,10 +36,21 @@ public class Usuario implements Serializable {
     @Column(name = "role", nullable = false, length = 50)
     private Role role = Role.CLIENTE;
 
+    @CreatedDate
+    @Column(name = "data_criacao")
     private LocalDateTime dataCriacao;
-    private String criadoPor;
+
+    @LastModifiedDate
+    @Column(name = "data_modificacao")
     private LocalDateTime dataModificacao;
-    private String modificadorPor;
+
+    @CreatedBy
+    @Column(name = "criado_por")
+    private String criadoPor;
+
+    @LastModifiedBy
+    @Column(name = "modificado_por")
+    private String modificadoPor;
 
     public enum Role {
         CLIENTE,
@@ -44,5 +63,10 @@ public class Usuario implements Serializable {
         if (o == null) return false;
         Usuario usuario = (Usuario) o;
         return Objects.equals(id, usuario.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
